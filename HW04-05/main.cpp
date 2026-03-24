@@ -148,14 +148,15 @@ class StockManager
 int main() 
 {
     AlchemyWorkshop myWorkshop;
+    StockManager stockManager;
 
     while (true) 
     {
         std::cout << "* Alchemy Workshop Management System" << std::endl;
         std::cout << "1. Add a Recipe" << std::endl;
         std::cout << "2. Output All Recipes" << std::endl;
-        std::cout << "3. Search By Name" << std::endl;
-        std::cout << "4. Search By Ingredient" << std::endl;
+        std::cout << "3. Give potion (search)" << std::endl;
+        std::cout << "4. Return potion" << std::endl;
         std::cout << "5. Ends" << std::endl;
         std::cout << "Choice : ";
 
@@ -213,41 +214,64 @@ int main()
         }
         else if (choice == 3)
         {
-            std::string name;
-            std::cout << "Enter potion name to search : ";
+            std::string input;
+            std::cout << "Enter potion name or ingredient : ";
             std::cin.ignore(10000, '\n');
-            std::getline(std::cin, name);
+            std::getline(std::cin, input);
 
-            PotionRecipe* result = myWorkshop.searchRecipeByName(name);
+            // 1. 이름으로 먼저 검색
+            PotionRecipe* recipe = myWorkshop.searchRecipeByName(input);
 
-            if (result != nullptr)
+            if (recipe != nullptr)
             {
-                result->print();
+                if (stockManager.dispensePotion(recipe->potionName))
+                {
+                    std::cout << "Potion given!" << std::endl;
+                }
+                else
+                {
+                    std::cout << "Out of Stock!" << std::endl;
+                }
             }
             else
             {
-                std::cout << "Recipe not found." << std::endl;
+                // 2. 재료로 검색
+                std::vector<PotionRecipe> results = myWorkshop.searchRecipeByIngredient(input);
+
+                if (results.empty())
+                {
+                    std::cout << "No matching recipes found." << std::endl;
+                }
+                else
+                {
+                    for (auto& r : results)
+                    {
+                        if (stockManager.dispensePotion(r.potionName))
+                        {
+                            std::cout << r.potionName << " given!" << std::endl;
+                        }
+                        else
+                        {
+                            std::cout << r.potionName << " is out of stock!" << std::endl;
+                        }
+                    }
+                }
             }
         }
         else if (choice == 4)
         {
-            std::string ingredient;
-            std::cout << "Enter ingredient to search : ";
+            std::string name;
+            std::cout << "Enter potion name to return : ";
             std::cin.ignore(10000, '\n');
-            std::getline(std::cin, ingredient);
+            std::getline(std::cin, name);
 
-            std::vector<PotionRecipe> results = myWorkshop.searchRecipeByIngredient(ingredient);
-
-            if (results.empty())
+            if (stockManager.returnPotion(name))
             {
-                std::cout << "No recipes found with that ingredient." << std::endl;
+                std::cout << "Potion returned!" << std::endl;
             }
             else
             {
-                for (size_t i = 0; i < results.size(); ++i)
-                {
-                    results[i].print();
-                }
+                std::cout << "Stock is already full!" << std::endl;
             }
         }
         else if (choice == 5) 
