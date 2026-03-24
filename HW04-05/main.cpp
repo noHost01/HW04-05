@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
 
 // PotionRecipe 클래스: 재료 목록을 vector<string>으로 변경
 class PotionRecipe 
@@ -74,6 +75,7 @@ class AlchemyWorkshop
             }
             std::cout << "---------------------------\n";
         }
+
         // 물약이름 기반으로 레시피를 찾아서, 해당 레시피 객체의 주소를 반환하는 함수
         PotionRecipe* searchRecipeByName(const std::string& name)
         {
@@ -104,6 +106,42 @@ class AlchemyWorkshop
                 }
             }
             return result;
+        }
+};
+
+// 포션 생성시 3개 지급 재고에 따른 추가 감소
+class StockManager
+{
+    private:
+        std::map<std::string, int> potionStock;
+        const int MAX_STOCK = 3;
+
+    public:
+        void initializeStock(const std::string& potionName)
+        {
+            potionStock[potionName] = MAX_STOCK;
+        }
+
+        bool dispensePotion(const std::string& potionName)
+        {
+            // 재고가 존재하고 1 이상인지 확인
+            if (potionStock[potionName] > 0)
+            {
+                potionStock[potionName]--;
+
+                return true;
+            }
+            return false;
+        }
+
+        bool returnPotion(const std::string& potionName)
+        {
+            if (potionStock[potionName] < MAX_STOCK)
+            {
+                potionStock[potionName]++;
+                return true;
+            }
+            return false;
         }
 };
 
