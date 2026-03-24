@@ -12,6 +12,23 @@ class PotionRecipe
         // 생성자: 재료 목록을 받아 초기화하도록 수정
         PotionRecipe(const std::string& name, const std::vector<std::string>& ingredients)
             : potionName(name), ingredients(ingredients) {}
+
+        // 정보를 화면에 출력하는 함수
+        void print() const
+        {
+            std::cout << "- Name of Potion : " << potionName << std::endl;
+            std::cout << "  > Required Materials : ";
+
+            for (size_t i = 0; i < ingredients.size(); ++i)
+            {
+                std::cout << ingredients[i];
+                if (i < ingredients.size() - 1)
+                {
+                    std::cout << ", ";
+                }
+            }
+            std::cout << std::endl;
+        }
 };
 
 // AlchemyWorkshop 클래스: 레시피 목록을 관리
@@ -97,9 +114,11 @@ int main()
     while (true) 
     {
         std::cout << "* Alchemy Workshop Management System" << std::endl;
-        std::cout << "1. Add a recipe" << std::endl;
-        std::cout << "2. Output all recipes" << std::endl;
-        std::cout << "3. Ends" << std::endl;
+        std::cout << "1. Add a Recipe" << std::endl;
+        std::cout << "2. Output All Recipes" << std::endl;
+        std::cout << "3. Search By Name" << std::endl;
+        std::cout << "4. Search By Ingredient" << std::endl;
+        std::cout << "5. Ends" << std::endl;
         std::cout << "Choice : ";
 
         int choice;
@@ -154,7 +173,46 @@ int main()
             myWorkshop.displayAllRecipes();
 
         }
-        else if (choice == 3) 
+        else if (choice == 3)
+        {
+            std::string name;
+            std::cout << "Enter potion name to search : ";
+            std::cin.ignore(10000, '\n');
+            std::getline(std::cin, name);
+
+            PotionRecipe* result = myWorkshop.searchRecipeByName(name);
+
+            if (result != nullptr)
+            {
+                result->print();
+            }
+            else
+            {
+                std::cout << "Recipe not found." << std::endl;
+            }
+        }
+        else if (choice == 4)
+        {
+            std::string ingredient;
+            std::cout << "Enter ingredient to search : ";
+            std::cin.ignore(10000, '\n');
+            std::getline(std::cin, ingredient);
+
+            std::vector<PotionRecipe> results = myWorkshop.searchRecipeByIngredient(ingredient);
+
+            if (results.empty())
+            {
+                std::cout << "No recipes found with that ingredient." << std::endl;
+            }
+            else
+            {
+                for (size_t i = 0; i < results.size(); ++i)
+                {
+                    results[i].print();
+                }
+            }
+        }
+        else if (choice == 5) 
         {
             std::cout << "I'm closing the workshop..." << std::endl;
             break;
